@@ -1,0 +1,55 @@
+---
+- name: "Server configuration"
+  hosts: slurm
+  become: true
+   
+  tasks:
+  - name: "Upgrade Linux"
+    
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400
+  - name: "Install Qemu agent"
+    ansible.builtin.apt:
+      name : qemu-guest-agent
+      state: present
+  - name: "Install utils"
+    ansible.builtin.apt:
+      pkg:
+      - vim
+      - tmux
+      - htop
+      - iotop
+      - iputils-ping 
+
+  # - name: Remove dependencies that are no longer required
+  #   ansible.builtin.apt:
+  #     autoremove: yes
+
+  # - name: Remove dependencies that are no longer required and purge their configuration files
+  #   ansible.builtin.apt:
+  #     autoremove: yes
+  #     purge: true
+
+  - name: "Configure hostname"
+    # ansible.builtin.command: "sudo sed -i 's//sav-ansible-slurm-01.savelev.ddns.net/' /etc/hostname"
+    ansible.builtin.hostname:
+      name: "sav-ansible-slurm-01.savelev.ddns.net"
+      use: systemd
+  # - name: "Configure hosts"
+    # ansible.builtin.command: "sudo sed -i 's/127.0.0.1.*/127.0.0.1 sav-ansible-slurm-01.savelev.ddns.net sav-ansible-slurm-01 localhost/' /etc/hosts"
+
+    # hostname:
+    #   name: "sav-ansible-slurm-01.savelev.ddns.net"
+    #   use: systemd
+       
+
+  # - name: Remove useless packages from the cache
+  #   ansible.builtin.apt:
+  #     autoclean: yes
+
+  # - name: "Enable publickey authorization"
+
+  # - name: "Add publickey"
+...

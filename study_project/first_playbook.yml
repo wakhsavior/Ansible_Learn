@@ -1,0 +1,8 @@
+- 
+  name: 'Show date'
+  hosts: linux 
+  tasks:
+    - name: 'Execute date'
+      command: date
+    - name: 'Execute a command to display hosts file'
+      command: cat /etc/hosts
