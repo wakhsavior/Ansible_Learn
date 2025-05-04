@@ -1,0 +1,14 @@
+- name: "Disable SE Linux"
+  ansible.posix.selinux:
+    state: disabled
+
+- name: "Reboot Server"
+  ansible.builtin.reboot:
+
+- name: "Install packages via DNF"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: "latest"
+    update_cache: true
+  with_items:
+  - "pip"

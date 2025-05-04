@@ -4,98 +4,31 @@
 ---
 - hosts: "sav-ansible-slurm-01"
   become: true
+  roles:
+  - main
+  - nginx  
+  - mysql
+  - php
   tasks:
+    - name: Print all available facts
+      ansible.builtin.debug:
+        var: ansible_facts
+    - name: "Reload nginx"
+      ansible.builtin.service:
+        name: "nginx"
+        state: "reloaded"
+    
+    - name: "Reload ntp"
+      ansible.builtin.service:
+        name: "ntpsec"
+        state: "restarted"
 
-  # Installing NGINX
 
-  - name: "Install Nginx via APT"
-    ansible.builtin.apt:
-      name: "nginx"
-      state: "latest"
-      update_cache: true 
-  - name: "Delete /var/www/html folder"
-    ansible.builtin.file:
-      path: "/var/www/html"
-      state: "absent"
-
-  - name: "Copy out html to /var/www/html folder"
-    ansible.builtin.copy:
-      src: "files/html"
-      dest: "/var/www/"
-      owner: "wakh"
-      group: "wakh"
-      mode: "0644"
-
-# Installing MySQL
-
-  - name: "Install MySQL via APT"
-    ansible.builtin.apt:
-      name: "mysql-server"
-      state: "latest"
-      update_cache: true 
-
-  - name: "Install pyMySQL via APT"
-    ansible.builtin.apt:
-      name: "python3-pymysql"
-      state: "latest"
-      update_cache: true 
-
-  - name: "Set up root user"
-    community.mysql.mysql_user:
-      name: "root"
-      password: "P@ssw0rd"
-      login_user: "root"
-      login_password: "P@ssw0rd"
-      check_implicit_admin: true 
-      login_unix_socket: "/var/run/mysqld/mysqld.sock"
-
-  - name: "Remove anonymous users"
-    community.mysql.mysql_user:
-      name: ""
-      state: "absent"
-      login_user: "root"
-      login_password: "P@ssw0rd"
-
-  - name: "Remove test DB"
-    community.mysql.mysql_db:
-      name: "test"
-      state: "absent"
-      login_user: "root"
-      login_password: "P@ssw0rd"
-
-# Installing "python3-pymysql"
-  - name: "Installing php fpm and php mysql"
-    ansible.builtin.apt:
-      name: "{{ item }}"
-      state: "latest"
-      update_cache: true
-    with_items:
-      - "php-fpm"
-      - "php-mysql"
   
-  - name: "Copy php files to /var/www/ folder"
-    ansible.builtin.copy:
-      src: "files/test-php/php_test"
-      dest: "/var/www/"
-      owner: "wakh"
-      group: "wakh"
-      mode: "0644"
 
-  - name: "Copy config Nginx for php test"
-    ansible.builtin.copy:
-      src: "files/test-php/nginx.conf" 
-      dest: "/etc/nginx/sites-available/php_test.conf"
-      owner: "wakh"
-      group: "wakh"
-      mode: "0644"
 
-  - name: "Create symlink for site in nginx"
-    ansible.builtin.file:
-      src: "/etc/nginx/sites-available/php_test.conf"
-      dest: "/etc/nginx/sites-enabled/php_test.conf"
-      state: "link"
 
-  - name: "Reload nginx"
-    ansible.builtin.service:
-      name: "nginx"
-      state: "reloaded"
+  
+
+
+  

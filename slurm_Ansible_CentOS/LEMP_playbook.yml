@@ -1,0 +1,29 @@
+#################
+# LEMP Playbook #
+#################
+---
+- hosts: "centos"
+  become: true
+  roles:
+  - common
+  - nginx  
+  - mysql
+  - php
+
+  tasks:
+    
+    - name: "Reload nginx"
+      ansible.builtin.service:
+        name: "nginx"
+        state: "reloaded"
+
+
+
+  
+
+
+
+  
+
+
+  

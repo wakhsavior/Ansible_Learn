@@ -1,0 +1,39 @@
+
+# Installing "php"
+
+- name: "Installing php fpm and php mysql"
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: "latest"
+    update_cache: true
+  with_items:
+    - "php"
+    - "php-cli"
+    - "php-fpm"
+    - "php-mysqlnd"
+  
+- name: "Enable service php-fpm and ensure it is not masked"
+  ansible.builtin.systemd_service:
+    name: "php-fpm"
+    enabled: true
+    state: started
+    masked: no
+
+- name: "Copy php files to /usr/share/nginx folder"
+  ansible.builtin.copy:
+    src: "files/test-php/php_test"
+    dest: "/usr/share/nginx/"
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"
+
+
+- name: "Copy config Nginx for php test"
+  ansible.builtin.copy:
+    src: "files/test-php/nginx.conf" 
+    dest: "/etc/nginx/conf.d/php_test.conf"
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"
+
+

@@ -1,0 +1,42 @@
+# Installing MySQL
+
+- name: "Install MySQL via DNF"
+  ansible.builtin.dnf:
+    name: "mysql-server"
+    state: "latest"
+    update_cache: true
+
+- name: "Enable service MySQL and ensure it is not masked"
+  ansible.builtin.systemd_service:
+    name: "mysqld"
+    enabled: true
+    masked: no
+
+- name: "Install pyMySQL via DNF"
+  ansible.builtin.dnf:
+    name: "python3-PyMySQL"
+    state: "latest"
+    update_cache: false 
+
+- name: "Set up root user"
+  community.mysql.mysql_user:
+    name: "root"
+    password: "P@ssw0rd"
+    login_user: "root"
+    login_password: "P@ssw0rd"
+    check_implicit_admin: true 
+    # login_unix_socket: "/var/lib/mysql/mysql.sock"
+
+- name: "Remove anonymous users"
+  community.mysql.mysql_user:
+    name: ""
+    state: "absent"
+    login_user: "root"
+    login_password: "P@ssw0rd"
+
+- name: "Remove test DB"
+  community.mysql.mysql_db:
+    name: "test"
+    state: "absent"
+    login_user: "root"
+    login_password: "P@ssw0rd"
