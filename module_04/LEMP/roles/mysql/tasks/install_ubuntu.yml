@@ -1,0 +1,20 @@
+- name: "Install MySQL via APT"
+  ansible.builtin.apt:
+    name: "mysql-server"
+    state: "latest"
+    update_cache: true 
+
+
+- name: "Install pyMySQL via APT"
+  ansible.builtin.apt:
+    name: "python3-pymysql"
+    state: "latest"
+    update_cache: true 
+
+- name: "Set up root user"
+  community.mysql.mysql_user:
+    name: "root"
+    password: "P@ssw0rd"
+    login_password: "P@ssw0rd"
+    check_implicit_admin: true 
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"

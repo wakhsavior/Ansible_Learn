@@ -1,0 +1,25 @@
+# Installing MySQL
+- name: "Ubuntu install"
+  include_tasks: "install_ubuntu.yml"
+  when: ansible_os_family == "Debian"
+
+- name: "CentOS install"
+  include_tasks: "install_centos.yml"
+  when: ansible_os_family == "RedHat"
+
+- name: "Remove anonymous users"
+  community.mysql.mysql_user:
+    name: ""
+    host_all: yes
+    state: "absent"
+    login_user: "root"
+    login_password: "P@ssw0rd"
+    check_implicit_admin: true
+
+- name: "Remove test DB"
+  community.mysql.mysql_db:
+    name: "test"
+    state: "absent"
+    login_user: "root"
+    login_password: "P@ssw0rd"
+    check_implicit_admin: true

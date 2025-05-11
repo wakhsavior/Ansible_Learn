@@ -1,0 +1,12 @@
+{% set ns = namespace(variable = 1) %} 
+{% for server in servers %}
+
+#---- Server 0{{ ns.variable }} ------#
+Space_name = {{ server.sname }}
+Software_list = {{ server.software }}
+{% if server.calls is defined %}
+Calls = {{ server.calls}}
+{% endif %}
+{% set ns.variable = ns.variable + 1 %} 
+
+{% endfor %}

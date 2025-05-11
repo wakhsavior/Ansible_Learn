@@ -1,0 +1,33 @@
+- name: "Install Nginx via APT"
+  ansible.builtin.apt:
+    name: "nginx"
+    state: "latest"
+    update_cache: true 
+
+- name: "Modify html folder permissions"
+  ansible.builtin.file:
+    path: /var/www/html
+    state: directory
+    owner: "wakh"
+    group: "wakh"
+
+- name: "Delete /var/www/html folder"
+  ansible.builtin.file:
+    path: "/var/www/html"
+    state: "absent"
+
+- name: "Copy out html to /var/www/html folder"
+  ansible.builtin.copy:
+    src: "files/html"
+    dest: "/var/www"
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"
+
+- name: "Replace default config"
+  ansible.builtin.template:
+    src: files/default.conf.j2
+    dest: /etc/nginx/sites-available/default.config"
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"

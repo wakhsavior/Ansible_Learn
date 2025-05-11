@@ -1,0 +1,6 @@
+services:
+  test:
+    image: python:3
+    command: python3 /code/test.py
+    volumes:
+    - .:/code

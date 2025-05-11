@@ -1,0 +1,47 @@
+- name: "Create .ssh folder"
+  ansible.builtin.file:
+    path: /home/wakh/.ssh/
+    state: directory
+    owner: "wakh"
+    group: "wakh"
+    mode: '0700'
+
+- name: "Test variables"
+  ansible.builtin.debug:
+     msg: "Variables {{ ssh_user }} : {{ public_key_file }}"
+
+- name: Add identity key to authorized keys on host
+  ansible.builtin.authorized_key: 
+    user: "{{ ssh_user }}"
+    key: "{{ lookup('file', public_key_file) }}"
+  register: add_identity_key
+  when: public_key_file is defined and ssh_user is defined
+
+- name: Disable empty password login
+  ansible.builtin.lineinfile: 
+    dest: "{{ sshd_config }}" 
+    regexp: '^#?PermitEmptyPasswords' 
+    line: 'PermitEmptyPasswords no'
+  # notify: restart sshd
+
+- name: Disable remote root login
+  ansible.builtin.lineinfile: 
+    dest: "{{ sshd_config }}" 
+    regexp: '^#?PermitRootLogin' 
+    line: 'PermitRootLogin no'
+  # notify: restart sshd
+
+- name: Disable password login
+  ansible.builtin.lineinfile: 
+    dest: "{{ sshd_config }}" 
+    regexp: '^(#\s*)?PasswordAuthentication '
+    line: 'PasswordAuthentication no'
+  when: 
+    - add_identity_key is succeeded 
+    - not add_identity_key is skipped
+  # notify: restart sshd
+
+- name: Restart SSH server
+  ansible.builtin.service:
+    name: sshd
+    state: restarted

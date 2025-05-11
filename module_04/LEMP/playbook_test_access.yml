@@ -1,0 +1,6 @@
+---
+- name: "Test access by ping"
+  hosts: all
+  tasks:
+  - name: "Ping"
+    ansible.builtin.ping: 

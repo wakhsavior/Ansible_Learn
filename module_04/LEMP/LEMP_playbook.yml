@@ -1,0 +1,29 @@
+#################
+# LEMP Playbook #
+#################
+---
+- name: "Deploy LEMP to different OS"
+  hosts: centos:ubuntu
+  become: true
+  vars: 
+    test_var: test
+    php_version: 7.3
+  roles:
+  - main
+  - nginx  
+  - mysql
+  - php
+  tasks:
+    - name: "Reload nginx"
+      ansible.builtin.service:
+        name: "nginx"
+        state: "reloaded"
+
+  
+
+
+
+  
+
+
+  

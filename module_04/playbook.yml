@@ -1,0 +1,6 @@
+---
+- hosts: linux_hosts
+  tasks:
+  - name: "ping pong"
+    ansible.builtin.ping:
+      

@@ -1,0 +1,33 @@
+- name: "Install MySQL via YUM"
+  ansible.builtin.yum:
+    name: "mariadb-server"
+    state: "latest"
+    update_cache: no 
+
+
+- name: "Install pyMySQL via YUM"
+  ansible.builtin.yum:
+    name: "python3-PyMySQL"
+    state: "latest"
+    update_cache: no 
+
+- name: "Start MariaDB"
+  service:
+    name: "mariadb"
+    state: started
+
+- name: "Set up root user"
+  become: true
+  community.mysql.mysql_user:
+    name: "root"
+    password: "P@ssw0rd"
+    login_password: "P@ssw0rd"
+    login_user: "root"
+    host: "{{ item }}"
+    check_implicit_admin: true
+    login_unix_socket: /var/lib/mysql/mysql.sock
+  with_items:
+    - 127.0.0.1
+    - localhost
+    # login_password: "P@ssw0rd"
+    # check_implicit_admin: true 

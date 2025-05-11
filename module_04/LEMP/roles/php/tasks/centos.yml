@@ -1,0 +1,71 @@
+- name: "Check PHP version"
+  ansible.builtin.fail:
+    msg: "The php of {{ php_version }} doesn't exist"
+  when: php_version > 9.0
+
+- name: Import remi GPG key.
+  rpm_key:
+    key: "http://rpms.remirepo.net/enterprise/9.5/RPM-GPG-KEY-remi"
+    state: present
+
+- name: "Add REPO for php"
+  ansible.builtin.yum:
+    name: 'http://rpms.remirepo.net/enterprise/remi-release-9.5.rpm'
+    update_cache: no
+    state: "latest"
+
+- name: "Installing php fpm and php mysql"
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    disablerepo: "remi-php54"
+    enablerepo:
+    - "remi"
+    - 'remi-php{{ php_version | replace(".","")}}'
+    state: "latest"
+    update_cache: no
+  with_items:
+    - "php"
+    - "php-cli"
+    - "php-fpm"
+    - "php-mysqlnd"
+  
+- name: "Check the nginx directory existence"
+  ansible.builtin.stat:
+    path: "/etc/nginx/conf.d" 
+  register: php_sites_available_stats
+
+- name: "Show php_sites_result"
+  ansible.builtin.debug:
+    var:  php_sites_available_stats
+
+- name: "Copy php files to /var/www/ folder"
+  ansible.builtin.copy:
+    src: "files/test-php/php_test"
+    dest: "/var/www"
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"
+  when: php_sites_available_stats["stat"]["exists"]
+
+- name: "Copy php config"
+  ansible.builtin.copy:
+    src: files/www.conf
+    dest: /etc/php-fpm.d/www.conf
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"
+  when: php_sites_available_stats["stat"]["exists"]
+
+- name: "Copy config Nginx for php test"
+  ansible.builtin.template:
+    src: "nginx.centos.conf.j2" 
+    dest: "/etc/nginx/conf.d/php_test.conf"
+    owner: "wakh"
+    group: "wakh"
+    mode: "0644"
+  when: php_sites_available_stats["stat"]["exists"]
+
+- name: "Restart fpm"
+  service:
+    name: php-fpm
+    state: reloaded

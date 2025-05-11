@@ -1,0 +1,6 @@
+# Main startup tasks
+
+
+- name: "CentOS Tasks"
+  include_tasks: "centos.yml"
+  when: ansible_os_family == "RedHat"

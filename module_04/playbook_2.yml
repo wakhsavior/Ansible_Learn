@@ -1,0 +1,22 @@
+---
+- name: "Basic group"
+  hosts: centos_hosts
+  become: true
+  vars: 
+    test_var: test
+    version: 7.0
+  tasks:
+  - name: "Test vars"
+    ansible.builtin.debug:
+      msg: "Variable is set to {{ test_var }} {{ ansible_date_time }}"
+  - name: "Print the package facts"
+    ansible.builtin.debug:
+      var: ansible_facts
+  - name:
+    ansible.builtin.debug:
+      msg: "Test php7"
+    when: version > 7.2 and version < 8.0
+  - name:
+    ansible.builtin.debug:
+      msg: Test php 8
+    when: version >= 8.0

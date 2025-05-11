@@ -1,0 +1,78 @@
+- name: "Install epel-release yum"
+  ansible.builtin.yum:
+    name: epel-release
+    update_cache: no
+    state: latest
+
+- name: "Install nginx yum"
+  ansible.builtin.yum:
+    name: nginx
+    update_cache: no
+    state: latest
+
+- name: "Modify html folder permissions"
+  ansible.builtin.file:
+    path: /var/www/html
+    state: directory
+    owner: wakh
+    group: wakh
+
+- name: "Delete old folder"
+  ansible.builtin.file:
+    state: absent
+    path: /usr/share/nginx/html
+
+- name: "Delete old folder"
+  ansible.builtin.file:
+    state: absent
+    path: /var/www/html
+
+
+
+- name: "Copy dist folder"
+  ansible.builtin.copy:
+    src: files/html
+    dest: /var/www
+    owner: wakh
+    group: wakh
+    mode: 0644
+
+- name: "replace default config"
+  ansible.builtin.template:
+    src: files/default.conf.j2
+    dest: /etc/nginx/conf.d/default.conf
+    owner: wakh
+    group: wakh
+    mode: 0644
+
+- name: "Allow http access to firewalld"
+  ansible.posix.firewalld:
+    service: http
+    state: enabled
+    permanent: true
+    immediate: true
+    offline: true
+    zone: public
+
+- name: "Allow https access to firewalld"
+  ansible.posix.firewalld:
+    service: https
+    state: enabled
+    permanent: true
+    immediate: true
+    offline: true
+    zone: public
+
+- name: Disable SELinux
+  ansible.posix.selinux:
+    # policy: targeted
+    state:  disabled
+  register: SELinux_status
+
+- name: "Show SELinux Disable task"
+  ansible.builtin.debug:
+    var: SELinux_status
+
+- name: "Reload Server"
+  ansible.builtin.reboot:
+  when: SELinux_status.changed == "true"
